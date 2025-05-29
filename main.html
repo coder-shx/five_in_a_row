@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五子棋</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            /*background-image: url('background.jpg'); !* 替换为你的图片路径 *!*/
+            /*background-size: cover; /* 图片覆盖整个页面 *!*/
+            /*background-position: center; /* 图片居中 *!*/
+            /*  background-repeat: no-repeat; /* 不重复图片 *!*/
+            /* height: 100vh;
+             /*width: 100vw;*/
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column; /* 如果按钮需要竖直排列 */
+            justify-content: center; /* 垂直居中 */
+            align-items: center; /* 水平居中 */
+            position: absolute; /* 使用绝对定位 */
+            top: 0; /* 设置容器顶部为0 */
+            left: 0; /* 设置容器左侧为0 */
+            right: 0; /* 设置容器右侧为0 */
+            bottom: 0; /* 设置容器底部为0 */
+            /* 可以使用背景颜色或其他样式区分可用区域 */
+        }
+
+        .btn {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 32px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        h1 {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 48px;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            padding: 20px;
+            color: green;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px gray;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%); /* 水平居中 */
+        }
+
+        h2 {
+            font-family: 'Helvetica Neue', Arial, sans-serif; /* 与 h1 使用相同的字体 */
+            font-size: 36px; /* 基础字大小，可以根据需求调整 */
+            text-align: center; /* 水平居中 */
+            letter-spacing: 1px; /* 可以选择略小的字母间距 */
+            margin-top: 70px; /* 垂直间隔，可根据需要调整 */
+            padding: 15px; /* 内边距，可根据需要调整 */
+            color: darkgreen; /* 颜色可以稍微不同于 h1，比如使用深绿色 */
+            border-radius: 8px; /* 边角圆度，可以略小于 h1 */
+            box-shadow: 1px 1px 5px gray; /* 阴影可以稍微小一些 */
+            position: absolute; /* 使用绝对定位 */
+            top: 60px; /* 根据需要设置距离顶部的高度 */
+            left: 50%;
+            transform: translateX(-50%); /* 水平居中 */
+        }
+
+        /* 响应式设置 */
+        @media screen and (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+
+            h2 {
+                font-size: 28px; /* 调整为适合中等屏幕的字体大小 */
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            h1 {
+                font-size: 28px;
+            }
+
+            h2 {
+                font-size: 24px; /* 调整为适合小屏幕的字体大小 */
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>五子棋</h1>
+<h2>先选择下面的按钮吧</h2>
+<div class="button-container">
+    <button class="btn btn-primary" id="aiButton">人机对战</button>
+    <button class="btn btn-secondary" id="humanButton">双人对战</button>
+    <button class="btn btn-danger" id="redButton">反馈按钮</button>
+</div>
+
+<script>
+    document.getElementById('aiButton').addEventListener('click', function () {
+        alert('即将进入人机对战模式');
+        window.location.href = "html/ai.html";
+    });
+
+    document.getElementById('humanButton').addEventListener('click', function () {
+        alert('即将进入双人对战模式');
+        window.location.href = "html/human.html"; // 替换为你要跳转的页面
+    });
+
+    document.getElementById('redButton').addEventListener('click', function () {
+        alert('联系微信ID:thslbjqtw，反馈你遇到的问题或bug');
+    });
+</script>
+
+</body>
+</html>
