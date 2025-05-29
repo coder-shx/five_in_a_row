@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五子棋</title>
+</head>
+
+<style>
+    .wrapper {
+        width: 700px;
+        position: relative;
+        margin: 0 auto 32px;
+    }
+
+    /* 棋盘 */
+    div.chessboard {
+        margin: 100px 0 0 0;
+        width: 542px;
+        left: 50%;
+        position: relative;
+        transform: translateX(-50%);
+        background: url(../images/chessboard.png) no-repeat 14px 14px rgb(250, 250, 250);
+        overflow: hidden;
+        box-shadow: 2px 2px 8px #888;
+        -webkit-box-shadow: 2px 2px 8px #888;
+        -moz-box-shadow: 2px 2px 8px #888;
+    }
+
+    div.chessboard div {
+        float: left;
+        width: 36px;
+        height: 36px;
+        border-top: 0 solid #ccc;
+        border-left: 0 solid #ccc;
+        border-right: 0;
+        border-bottom: 0;
+        cursor: pointer;
+    }
+
+    /* 棋子 */
+    div.chessboard div.black {
+        background: url(../images/black.png) no-repeat 4px 4px;
+    }
+
+    div.chessboard div.white {
+        background: url(../images/white.png) no-repeat 4px 4px;
+    }
+
+    div.chessboard div.hover {
+        background: url(../images/center.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.hover-up {
+        background: url(../images/center_up.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.hover-down {
+        background: url(../images/center_down.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.hover-up-left {
+        background: url(../images/center_up_left.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.hover-up-right {
+        background: url(../images/center_up_right.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.hover-left {
+        background: url(../images/center_left.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.hover-right {
+        background: url(../images/center_right.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.hover-down-left {
+        background: url(../images/center_down_left.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.hover-down-right {
+        background: url(../images/center_down_right.png) no-repeat 1px 1px;
+    }
+
+    div.chessboard div.white-last {
+        background: url(../images/white_last.png) no-repeat 4px 4px;
+    }
+
+    div.chessboard div.black-last {
+        background: url(../images/black_last.png) no-repeat 4px 4px;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        display: flex;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        /*可以放个机器人图片等*/
+    }
+
+    .button-container {
+        display: flex;
+        flex-direction: column; /* 垂直排列按钮 */
+        align-items: flex-end; /* 按钮对齐到右边 */
+        position: absolute; /* 使用绝对定位 */
+        top: 50%; /* 设置垂直位置为视口的50% */
+        right: 20px; /* 设置按钮容器距离右侧10px */
+        transform: translateY(-50%); /* 将按钮容器垂直居中 */
+    }
+
+    .btn {
+        padding: 15px 30px;
+        margin: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #2980b9;
+        color: white;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .btn-warning {
+        background-color: #f39c12;
+        color: white;
+    }
+
+    h1 {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 34px;
+        text-align: center;
+        letter-spacing: 2px;
+        margin-top: 10px;
+        padding: 20px;
+        color: green;
+        border-radius: 8px;
+        box-shadow: 2px 2px 10px gray;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%); /* 水平居中 */
+    }
+
+    @media screen and (max-width: 768px) {
+        h1 {
+            font-size: 36px;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        h1 {
+            font-size: 28px;
+        }
+    }
+
+    /* 模态框样式 */
+    .modal {
+        display: none; /* 初始时隐藏 */
+        position: fixed; /* 固定定位 */
+        z-index: 1000; /* 确保在最上层 */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+        justify-content: center; /* 水平居中 */
+        align-items: center; /* 垂直居中 */
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal button {
+        margin: 5px;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .selected {
+        background-color: green; /* 选中状态的背景颜色 */
+        color: white; /* 选中状态的文字颜色 */
+    }
+</style>
+<body>
+<h1>五子棋</h1>
+<div class="wrapper">
+    <div class="chessboard">
+        <!-- top line -->
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top"></div>
+        <div class="chess-top chess-right"></div>
+        <!-- line 1 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 2 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 3 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 4 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 5 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 6 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 7 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 8 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 9 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 10 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 11 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 12 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- line 13 -->
+        <div class="chess-left"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-middle"></div>
+        <div class="chess-right"></div>
+        <!-- bottom line  -->
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom"></div>
+        <div class="chess-bottom chess-right"></div>
+    </div>
+    <div style="display: none">
+        <!-- 图片需合并 减少http请求数 -->
+        <img src="../images/black.png" alt="preload"/>
+        <img src="../images/white.png" alt="preload"/>
+        <img src="../images/center.png" alt="preload"/>
+        <img src="../images/center_up.png" alt="preload"/>
+        <img src="../images/center_down.png" alt="preload"/>
+        <img src="../images/center_up_left.png" alt="preload"/>
+        <img src="../images/center_up_right.png" alt="preload"/>
+        <img src="../images/center_left.png" alt="preload"/>
+        <img src="../images/center_right.png" alt="preload"/>
+        <img src="../images/center_down_left.png" alt="preload"/>
+        <img src="../images/center_down_right.png" alt="preload"/>
+        <img src="../images/black_last.png" alt="preload"/>
+        <img src="../images/white_last.png" alt="preload"/>
+    </div>
+</div>
+<div class="button-container">
+    <!--先手后手，黑子白子-->
+    <button class="btn btn-primary" id="humanButton">开始游戏</button>
+    <button class="btn btn-secondary" id="reverseButton">返回按钮</button>
+    <button class="btn btn-danger" id="redButton">反馈按钮</button>
+    <button class="btn btn-warning" id="resetButton">重置棋盘</button>
+</div>
+
+<script>
+    // 创建一个 15x15 的 0 数组chessboard
+    const BOARD_SIZE = 15;//1为黑，2为白
+    let chessboard = Array.from({length: BOARD_SIZE}, () => Array.from({length: BOARD_SIZE}, () => 0));
+    let GameStart = false;
+    document.getElementById('humanButton').addEventListener('click', function () {
+        if (GameStart) {
+            alert('游戏已经开始，请先结束当前游戏');
+            return;
+        }
+        // 在这里执行开始游戏
+        GameStart = true;
+        startGame();
+    });
+
+    document.getElementById('reverseButton').addEventListener('click', function () {
+        window.location.href = "../main.html";
+    });
+
+    document.getElementById('redButton').addEventListener('click', function () {
+        alert('联系微信ID:thslbjqtw，反馈你遇到的问题或bug');
+    });
+    document.getElementById('resetButton').addEventListener('click', function () {
+        chessboard = null;
+        window.location.reload();//重新加载页面
+    });
+    // 模态框
+    let Last = [-1, -1];//最后落子的位置
+    let turn = 1;//1为玩家1，2为玩家2
+    function startGame() {
+        // 在这里执行开始游戏;创建一个 15x15 的 0 数组chessboard;1为黑，2为白
+        chessboard = Array.from({length: 15}, () => Array.from({length: 15}, () => 0));
+        turn = 1;
+        //可增加计时功能
+        humanPutChess(Last, turn);  // 如果玩家先手，立即进入玩家落子
+    }
+
+    // 玩家下棋
+    function humanPutChess(Last, turn) {
+        if (turn !== 1 || isGameOver(chessboard) || isFull(chessboard)) return;
+        //增加计时
+        document.querySelectorAll('div.chessboard div').forEach((cell, index) => {
+            cell.removeEventListener('click', handleClick); // 移除之前的点击事件
+            cell.addEventListener('click', handleClick); // 重新绑定点击事件
+        });
+
+        function handleClick(event) {
+            if (turn !== 1 || isGameOver(chessboard) || isFull(chessboard)) return;
+            const index = Array.from(event.target.parentNode.children).indexOf(event.target);
+            // 获取行和列
+            const i = Math.floor(index / 15);
+            const j = index % 15;
+            // 检查是否可以落子
+            console.log(i, j, Last);
+            if (chessboard[i][j] !== 0) {
+                alert("格子已经被占了，无法落子");
+                return;
+            }
+            // 清空之前的 hover 效果
+            const chessCells = document.querySelectorAll('div.chessboard div');
+            chessCells.forEach(cell => {
+                cell.classList.remove('hover', 'hover-up', 'hover-down', 'hover-left', 'hover-right', 'hover-up-left', 'hover-up-right', 'hover-down-left', 'hover-down-right');
+            });
+            // 玩家下子
+            chessboard[i][j] = 1;
+            event.target.classList.add('black-last');
+
+            if (Last[0] >= 0) {
+                document.querySelector(`div.chessboard div:nth-child(${Last[0] * 15 + Last[1] + 1})`).classList.remove('white-last');
+                document.querySelector(`div.chessboard div:nth-child(${Last[0] * 15 + Last[1] + 1})`).classList.add('white');
+            }
+            Last = [i, j];
+            // 检查游戏是否结束
+            if (isGameOver(chessboard)) {
+                alert("游戏结束 " + ((isGameOver(chessboard) === 1) ? "黑方" : "白方") + "获胜");
+                return;
+            }
+            if (isFull(chessboard)) {
+                alert("游戏结束 平局");
+                return;
+            }
+            turn = 2;
+            otherPutChess(Last, turn);
+        }
+    }
+
+    function otherPutChess(Last, turn) {
+        if (turn !== 2 || isGameOver(chessboard) || isFull(chessboard)) return;
+        //增加计时
+        document.querySelectorAll('div.chessboard div').forEach((cell, index) => {
+            cell.removeEventListener('click', handleClick); // 移除之前的点击事件
+            cell.addEventListener('click', handleClick); // 重新绑定点击事件
+        });
+
+        function handleClick(event) {
+            if (turn !== 2 || isGameOver(chessboard) || isFull(chessboard)) return;
+            const index = Array.from(event.target.parentNode.children).indexOf(event.target);
+            // 获取行和列
+            const i = Math.floor(index / 15);
+            const j = index % 15;
+            console.log(":", i, j, Last);
+            if (chessboard[i][j] !== 0) {
+                alert("格子已经被占了，无法落子");
+                return;
+            }
+            // 清空之前的 hover 效果
+            const chessCells = document.querySelectorAll('div.chessboard div');
+            chessCells.forEach(cell => {
+                cell.classList.remove('hover', 'hover-up', 'hover-down', 'hover-left', 'hover-right', 'hover-up-left', 'hover-up-right', 'hover-down-left', 'hover-down-right');
+            });
+            // 玩家下子
+            chessboard[i][j] = 2;
+            event.target.classList.add('white-last');
+            //下棋逻辑
+            if (Last[0] >= 0) {
+                document.querySelector(`div.chessboard div:nth-child(${Last[0] * 15 + Last[1] + 1})`).classList.remove('black-last');
+                document.querySelector(`div.chessboard div:nth-child(${Last[0] * 15 + Last[1] + 1})`).classList.add('black');
+            }
+            Last = [i, j];
+            // 检查游戏是否结束
+            if (isGameOver(chessboard)) {
+                alert("游戏结束 " + ((isGameOver(chessboard) === 1) ? "黑方" : "白方") + "获胜");
+                return;
+            }
+            if (isFull(chessboard)) {
+                alert("游戏结束 平局");
+            }
+            turn = 1;
+            humanPutChess(Last, turn);
+        }
+    }
+
+    //鼠标事件
+    document.querySelectorAll('div.chessboard div').forEach((cell, index) => {
+        cell.addEventListener('mouseenter', function () {
+            if (chessboard[Math.floor(index / 15)][index % 15] !== 0 || isGameOver(chessboard)) return;
+            const i = Math.floor(index / 15);
+            const j = index % 15;
+
+            // 添加 hover 效果
+            cell.classList.add('hover');
+            if (i === 0 && j === 0) {
+                cell.classList.add('hover-up-left');
+            } else if (i === 0 && j === 14) {
+                cell.classList.add('hover-up-right');
+            } else if (i === 14 && j === 0) {
+                cell.classList.add('hover-down-left');
+            } else if (i === 14 && j === 14) {
+                cell.classList.add('hover-down-right');
+            } else if (i === 0) {
+                cell.classList.add('hover-up');
+            } else if (i === 14) {
+                cell.classList.add('hover-down');
+            } else if (j === 0) {
+                cell.classList.add('hover-left');
+            } else if (j === 14) {
+                cell.classList.add('hover-right');
+            }
+        });
+        cell.addEventListener('mouseleave', function () {
+            // 移除 hover 效果
+            cell.classList.remove('hover', 'hover-up', 'hover-down', 'hover-left', 'hover-right', 'hover-up-left', 'hover-up-right', 'hover-down-left', 'hover-down-right');
+        });
+        cell.addEventListener('click', function (event) {
+            if (!GameStart)
+                alert("请你先点击开始游戏");
+            if (isGameOver(chessboard) || isFull(chessboard)) {
+                alert("游戏已经结束啦！");
+            }
+        });
+    });
+
+    //游戏是否结束
+    function isGameOver(chessboard) {
+        //横方向
+        for (let row = 0; row < 15; row++) {
+            for (let col = 0; col < 11; col++) {
+                if (chessboard[row][col] !== 0 && chessboard[row][col] === chessboard[row][col + 1] && chessboard[row][col + 1] === chessboard[row][col + 2] && chessboard[row][col + 2] === chessboard[row][col + 3] && chessboard[row][col + 3] === chessboard[row][col + 4]) {
+                    let winner = chessboard[row][col];
+                    for (; ; col++) {
+                        if (col <= 14 && winner === chessboard[row][col]) {
+                            if (chessboard[row][col] === 2) {
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.remove('white');
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.add('white-last');
+                            } else {
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.remove('black');
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.add('black-last');
+                            }
+                        } else break;
+                    }
+                    return winner;
+                }
+            }
+        }
+        //竖方向
+        for (let row = 0; row < 11; row++) {
+            for (let col = 0; col < 15; col++) {
+                if (chessboard[row][col] !== 0 && chessboard[row][col] === chessboard[row + 1][col] && chessboard[row + 1][col] === chessboard[row + 2][col] && chessboard[row + 2][col] === chessboard[row + 3][col] && chessboard[row + 3][col] === chessboard[row + 4][col]) {
+                    let winner = chessboard[row][col];
+                    for (; ; row++) {
+                        if (row <= 14 && winner === chessboard[row][col]) {
+                            if (chessboard[row][col] === 2) {
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.remove('white');
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.add('white-last');
+                            } else {
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.remove('black');
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.add('black-last');
+                            }
+                        } else break;
+                    }
+                    return winner;
+                }
+            }
+        }
+        //斜上方向
+        for (let row = 0; row < 11; row++) {
+            for (let col = 0; col < 11; col++) {
+                if (chessboard[row][col] !== 0 && chessboard[row][col] === chessboard[row + 1][col + 1] && chessboard[row + 1][col + 1] === chessboard[row + 2][col + 2] && chessboard[row + 2][col + 2] === chessboard[row + 3][col + 3] && chessboard[row + 3][col + 3] === chessboard[row + 4][col + 4]) {
+                    let winner = chessboard[row][col];
+                    for (; ; row++, col++) {
+                        if (row <= 14 && col <= 14 && winner === chessboard[row][col]) {
+                            if (chessboard[row][col] === 2) {
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.remove('white');
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.add('white-last');
+                            } else {
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.remove('black');
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.add('black-last');
+                            }
+                        } else break;
+                    }
+                    return winner;
+                }
+            }
+        }
+        //斜下方向
+        for (let row = 14; row >= 4; row--) {
+            for (let col = 0; col < 11; col++) {
+                if (chessboard[row][col] !== 0 && chessboard[row][col] === chessboard[row - 1][col + 1] && chessboard[row - 1][col + 1] === chessboard[row - 2][col + 2] && chessboard[row - 2][col + 2] === chessboard[row - 3][col + 3] && chessboard[row - 3][col + 3] === chessboard[row - 4][col + 4]) {
+                    let winner = chessboard[row][col];
+                    for (; ; row--, col++) {
+                        if (row >= 0 && col <= 14 && winner === chessboard[row][col]) {
+                            if (chessboard[row][col] === 2) {
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.remove('white');
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.add('white-last');
+                            } else {
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.remove('black');
+                                document.querySelector(`div.chessboard div:nth-child(${row * 15 + col + 1})`).classList.add('black-last');
+                            }
+                        } else break;
+                    }
+                    return winner;
+                }
+            }
+        }
+        return 0;
+    }
+
+    //判断是否平局
+    function isFull(chessboard) {
+        for (let row = 0; row < 15; row++) {
+            for (let col = 0; col < 15; col++) {
+                if (chessboard[row][col] === 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+</script>
+</body>
+</html>
